@@ -1,0 +1,15 @@
+# Notebook
+jupyter
+
+# Data manipulation
+numpy
+pandas
+
+# Data visualization
+matplotlib
+
+# Machine learning libraries
+keras
+tensorflow-gpu
+sklearn
+
