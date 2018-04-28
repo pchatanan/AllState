@@ -11968,7 +11968,7 @@ div#notebook {
 <span class="nb">print</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="c1"># Observe that means are 0s and standard deviations are 1s</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">describe</span><span class="p">())</span>
-<span class="c1">#print(temp.skew())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">skew</span><span class="p">())</span>
 </pre></div>
 
 </div>
@@ -12025,6 +12025,22 @@ min         0.000228       0.179722       0.670000
 50%         0.363547       0.407403    2115.570000  
 75%         0.689974       0.724623    3864.045000  
 max         0.988494       0.844848  121012.250000  
+cont1     0.516424
+cont2    -0.310941
+cont3    -0.010002
+cont4     0.416096
+cont5     0.681622
+cont6     0.461214
+cont7     0.826053
+cont8     0.676634
+cont9     1.072429
+cont10    0.355001
+cont11    0.280821
+cont12    0.291992
+cont13    0.380742
+cont14    0.248674
+loss      3.794958
+dtype: float64
 </pre>
 </div>
 </div>
@@ -12735,7 +12751,7 @@ Test: 125546
     <span class="p">(</span><span class="s1">&#39;model_result_g&#39;</span><span class="p">,</span> <span class="n">xgb_g_models</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;model_result_mcw&#39;</span><span class="p">,</span> <span class="n">xgb_mcw_models</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;model_result_lr&#39;</span><span class="p">,</span> <span class="n">xgb_lr_models</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">&#39;model_result_test&#39;</span><span class="p">,</span> <span class="n">xgb_test_models</span><span class="p">)</span>
+    <span class="p">(</span><span class="s1">&#39;model_result_d4&#39;</span><span class="p">,</span> <span class="n">xgb_test_models</span><span class="p">)</span>
 <span class="p">]</span>
 
 <span class="n">all_model_results</span> <span class="o">=</span> <span class="p">{}</span>
@@ -12881,35 +12897,54 @@ XGB-d4-lr0.09 1149.5787524222974
 <div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model_used</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;XGB-d8-lr0.08&#39;</span><span class="p">,</span> <span class="s1">&#39;XGB-d7-lr0.08&#39;</span><span class="p">,</span> <span class="s1">&#39;XGB-d6-lr0.08&#39;</span><span class="p">,</span> <span class="s1">&#39;XGB-d5-lr0.08&#39;</span><span class="p">,</span> <span class="s1">&#39;XGB-d4-lr0.08&#39;</span><span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="n">model_used</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;XGB-d8-lr0.08&#39;</span><span class="p">,</span> <span class="s1">&#39;XGB-d7-lr0.08&#39;</span><span class="p">,</span> <span class="s1">&#39;XGB-d6-lr0.08&#39;</span><span class="p">,</span> <span class="s1">&#39;XGB-d5-lr0.08&#39;</span><span class="p">,</span> <span class="s1">&#39;XGB-d4-lr0.08&#39;</span><span class="p">]</span>
 
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
 <span class="n">minimum</span> <span class="o">=</span> <span class="mi">2000</span>
-<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
-    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model_used</span><span class="p">))</span>
-    <span class="n">w</span> <span class="o">/=</span> <span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
-    <span class="n">preds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">all_model_results</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;pred&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">model_used</span><span class="p">])</span>
-    <span class="n">stacking</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="k">import</span> <span class="n">SVR</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LinearRegression</span>
 
-    <span class="n">mae</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">train_idx</span><span class="p">,</span> <span class="n">val_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">XY_train</span><span class="p">)):</span>
-        <span class="n">X_train</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_idx</span><span class="p">,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">X_val</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">val_idx</span><span class="p">,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">Y_train</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_idx</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">Y_val</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">val_idx</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">all_model_results</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;pred&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">model_used</span><span class="p">])</span>
 
-        <span class="n">pred</span> <span class="o">=</span> <span class="n">stacking</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">scaler_y</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">Y_val</span><span class="p">))</span> <span class="o">-</span> <span class="n">best_shift</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">scaler_y</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">pred</span><span class="p">))</span> <span class="o">-</span> <span class="n">best_shift</span><span class="p">)</span>
+<span class="n">mae</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">X_ensem</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">Y_ensem</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">train_idx</span><span class="p">,</span> <span class="n">val_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">XY_train</span><span class="p">)):</span>
+    <span class="n">X_train</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_idx</span><span class="p">,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">X_val</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">val_idx</span><span class="p">,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">Y_train</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_idx</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">Y_val</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">val_idx</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="n">mae</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">preds</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span>
 
-    <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mae</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">mean</span> <span class="o">&lt;</span> <span class="n">minimum</span><span class="p">:</span>
-        <span class="n">minimum</span> <span class="o">=</span> <span class="n">mean</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;weights: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;MAE: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mean</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">X_ensem</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">X_ensem</span> <span class="o">=</span> <span class="n">pred</span>
+        <span class="n">Y_ensem</span> <span class="o">=</span> <span class="n">Y_val</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">X_ensem</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">X_ensem</span><span class="p">,</span> <span class="n">pred</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Y_ensem</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">Y_ensem</span><span class="p">,</span> <span class="n">Y_val</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../result/&#39;</span> <span class="o">+</span> <span class="s2">&quot;ensemble_model&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">ensemble_model</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+    <span class="n">ensemble_model</span> <span class="o">=</span> <span class="n">SVR</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;fitting&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">X_ensem</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">Y_ensem</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">ensemble_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_ensem</span><span class="p">,</span> <span class="n">Y_ensem</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;fitting done&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../result/&#39;</span> <span class="o">+</span> <span class="s2">&quot;ensemble_model&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">ensemble_model</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;predicting&quot;</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">ensemble_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_ensem</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">scaler_y</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">Y_ensem</span><span class="p">))</span> <span class="o">-</span> <span class="n">best_shift</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">scaler_y</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">pred</span><span class="p">))</span> <span class="o">-</span> <span class="n">best_shift</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;result: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -12926,16 +12961,8 @@ XGB-d4-lr0.09 1149.5787524222974
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>weights: [0.19356424 0.25224431 0.21259213 0.19217803 0.14942128]
-MAE: 1141.4174864916906
-weights: [0.17787844 0.17628299 0.17767641 0.27179856 0.1963636 ]
-MAE: 1141.3119735779621
-weights: [0.39704191 0.1245541  0.07632904 0.18674501 0.21532995]
-MAE: 1141.2478696989513
-weights: [0.19756573 0.20301259 0.19622655 0.07649522 0.32669991]
-MAE: 1141.0663457150695
-weights: [0.30139663 0.20910391 0.06606862 0.14546771 0.27796313]
-MAE: 1140.9792407352725
+<pre>predicting
+result: 1136.794503028462
 </pre>
 </div>
 </div>
@@ -12957,69 +12984,83 @@ MAE: 1140.9792407352725
 <div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">xgboost</span> <span class="k">import</span> <span class="n">XGBRegressor</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">Y</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
 
-    <span class="n">m1</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s1">&#39;gpu_hist&#39;</span><span class="p">,</span>
-                              <span class="n">max_depth</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-                              <span class="n">gamma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                              <span class="n">min_child_weight</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-                              <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../result/&#39;</span> <span class="o">+</span> <span class="s2">&quot;predictions&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">xgboost</span> <span class="k">import</span> <span class="n">XGBRegressor</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">XY_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span>
 
-    <span class="n">m2</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">280</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s1">&#39;gpu_hist&#39;</span><span class="p">,</span>
-                              <span class="n">max_depth</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
-                              <span class="n">gamma</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                              <span class="n">min_child_weight</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-                              <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s1">&#39;gpu_hist&#39;</span><span class="p">,</span>
+                                  <span class="n">max_depth</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                                  <span class="n">gamma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                  <span class="n">min_child_weight</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                  <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
 
-    <span class="n">m3</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s1">&#39;gpu_hist&#39;</span><span class="p">,</span>
-                              <span class="n">max_depth</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
-                              <span class="n">gamma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                              <span class="n">min_child_weight</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-                              <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
+        <span class="n">m2</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">280</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s1">&#39;gpu_hist&#39;</span><span class="p">,</span>
+                                  <span class="n">max_depth</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+                                  <span class="n">gamma</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                  <span class="n">min_child_weight</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                  <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
 
-    <span class="n">m4</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">780</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s1">&#39;gpu_hist&#39;</span><span class="p">,</span>
-                              <span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-                              <span class="n">gamma</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                              <span class="n">min_child_weight</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-                              <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
+        <span class="n">m3</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s1">&#39;gpu_hist&#39;</span><span class="p">,</span>
+                                  <span class="n">max_depth</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+                                  <span class="n">gamma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                  <span class="n">min_child_weight</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                                  <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
 
-    <span class="n">m5</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s1">&#39;gpu_hist&#39;</span><span class="p">,</span>
-                              <span class="n">max_depth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-                              <span class="n">gamma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                              <span class="n">min_child_weight</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                              <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
+        <span class="n">m4</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">780</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s1">&#39;gpu_hist&#39;</span><span class="p">,</span>
+                                  <span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                  <span class="n">gamma</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                  <span class="n">min_child_weight</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                  <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
 
-    <span class="n">m1</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
-    <span class="n">pred1</span> <span class="o">=</span> <span class="n">getPred</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done fit 1&quot;</span><span class="p">)</span>
-    <span class="n">m2</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
-    <span class="n">pred2</span> <span class="o">=</span> <span class="n">getPred</span><span class="p">(</span><span class="n">m2</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done fit 2&quot;</span><span class="p">)</span>
-    <span class="n">m3</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
-    <span class="n">pred3</span> <span class="o">=</span> <span class="n">getPred</span><span class="p">(</span><span class="n">m3</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done fit 3&quot;</span><span class="p">)</span>
-    <span class="n">m4</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
-    <span class="n">pred4</span> <span class="o">=</span> <span class="n">getPred</span><span class="p">(</span><span class="n">m4</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done fit 4&quot;</span><span class="p">)</span>
-    <span class="n">m5</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
-    <span class="n">pred5</span> <span class="o">=</span> <span class="n">getPred</span><span class="p">(</span><span class="n">m5</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done fit 5&quot;</span><span class="p">)</span>
+        <span class="n">m5</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s1">&#39;gpu_hist&#39;</span><span class="p">,</span>
+                                  <span class="n">max_depth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                                  <span class="n">gamma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                  <span class="n">min_child_weight</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                  <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
 
-    <span class="n">predictions</span> <span class="o">=</span> <span class="mf">0.30139663</span><span class="o">*</span><span class="n">pred1</span> <span class="o">+</span> <span class="mf">0.20910391</span><span class="o">*</span><span class="n">pred2</span> <span class="o">+</span> <span class="mf">0.06606862</span><span class="o">*</span><span class="n">pred3</span> <span class="o">+</span> <span class="mf">0.14546771</span><span class="o">*</span><span class="n">pred4</span> <span class="o">+</span> <span class="mf">0.27796313</span><span class="o">*</span><span class="n">pred5</span>
-    <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">scaler_y</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">predictions</span><span class="p">))</span> <span class="o">-</span> <span class="n">best_shift</span>
+        <span class="n">m1</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
+        <span class="n">pred1</span> <span class="o">=</span> <span class="n">getPred</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">pred1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done fit 1&quot;</span><span class="p">)</span>
+        <span class="n">m2</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
+        <span class="n">pred2</span> <span class="o">=</span> <span class="n">getPred</span><span class="p">(</span><span class="n">m2</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done fit 2&quot;</span><span class="p">)</span>
+        <span class="n">m3</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
+        <span class="n">pred3</span> <span class="o">=</span> <span class="n">getPred</span><span class="p">(</span><span class="n">m3</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done fit 3&quot;</span><span class="p">)</span>
+        <span class="n">m4</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
+        <span class="n">pred4</span> <span class="o">=</span> <span class="n">getPred</span><span class="p">(</span><span class="n">m4</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done fit 4&quot;</span><span class="p">)</span>
+        <span class="n">m5</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
+        <span class="n">pred5</span> <span class="o">=</span> <span class="n">getPred</span><span class="p">(</span><span class="n">m5</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done fit 5&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Write submissions to output file in the correct format</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;submission.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">subfile</span><span class="p">:</span>
-        <span class="n">subfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;id,loss</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">predictions</span><span class="p">)):</span>
-            <span class="n">subfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">ID</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">pred</span><span class="p">))</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">pred1</span><span class="p">,</span> <span class="n">pred2</span><span class="p">,</span> <span class="n">pred3</span><span class="p">,</span> <span class="n">pred4</span><span class="p">,</span> <span class="n">pred5</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done&quot;</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">ModuleNotFoundError</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;XGBoost is not installed with GUP support&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../result/&#39;</span> <span class="o">+</span> <span class="s2">&quot;predictions&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            
+    <span class="k">except</span> <span class="n">ModuleNotFoundError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;XGBoost is not installed with GUP support&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">predictions</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">ensemble_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">scaler_y</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">predictions</span><span class="p">))</span> <span class="o">-</span> <span class="n">best_shift</span>
+
+<span class="c1"># Write submissions to output file in the correct format</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;submission.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">subfile</span><span class="p">:</span>
+    <span class="n">subfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;id,loss</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">predictions</span><span class="p">)):</span>
+        <span class="n">subfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">ID</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">pred</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done&quot;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -13036,11 +13077,7 @@ MAE: 1140.9792407352725
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>done fit 1
-done fit 2
-done fit 3
-done fit 4
-done fit 5
+<pre>(125546, 5)
 Done
 </pre>
 </div>
